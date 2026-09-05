@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0c11">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Anime Tracker">
+<title>Anime Tracker</title>
+
+<style>
+:root{
+  --bg:#0b0c11;
+  --card:#171922;
+  --line:#292d39;
+  --text:#f5f6fa;
+  --muted:#9ea5b4;
+  --accent:#7b6cf6
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  padding:env(safe-area-inset-top) 0 calc(82px + env(safe-area-inset-bottom));
+  min-height:100vh
+}
+.wrap{max-width:760px;margin:auto}
+header{
+  position:sticky;
+  top:0;
+  z-index:5;
+  padding:18px 16px 12px;
+  background:rgba(11,12,17,.94);
+  backdrop-filter:blur(14px)
+}
+.top{display:flex;justify-content:space-between;align-items:center}
+h1{margin:0;font-size:28px}
+.sub{color:var(--muted);font-size:13px;margin-top:4px}
+.btn,.chip,input,select,textarea{font:inherit}
+.btn{
+  border:0;
+  border-radius:14px;
+  padding:11px 14px;
+  background:#222531;
+  color:var(--text);
+  font-weight:700
+}
+.add{
+  width:44px;
+  height:44px;
+  padding:0;
+  font-size:26px;
+  background:var(--accent)
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+  padding:0 16px 14px
+}
+.stat{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:12px
+}
+.stat b{font-size:21px;display:block}
+.stat span{font-size:11px;color:var(--muted)}
+.controls{padding:0 16px}
+.search{
+  width:100%;
+  padding:13px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:15px;
+  color:var(--text)
+}
+.filters{
+  display:flex;
+  gap:7px;
+  overflow:auto;
+  padding:10px 0
+}
+.chip{
+  white-space:nowrap;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--card);
+  color:var(--text);
+  padding:8px 11px
+}
+.chip.on{
+  background:var(--accent);
+  border-color:var(--accent)
+}
+.title{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 16px 8px;
+  align-items:end
+}
+.title h2{font-size:18px;margin:0}
+.title small{color:var(--muted)}
+.list{
+  display:grid;
+  gap:9px;
+  padding:0 16px 18px
+}
+.card{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:12px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:13px
+}
+.name{font-weight:800}
+.meta{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:5px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:70vw
+}
+.progress{
+  height:5px;
+  background:#252936;
+  border-radius:9px;
+  margin-top:10px;
+  overflow:hidden
+}
+.bar{height:100%;background:var(--accent)}
+.ep{font-size:11px;color:var(--muted);margin-top:5px}
+.side{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  align-items:end
+}
+.rating{font-size:12px;color:#f5c75d;font-weight:800}
+.plus{
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  border:0;
+  background:#252836;
+  color:white;
+  font-size:17px;
+  font-weight:800
+}
+.bottom{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:rgba(12,13,18,.95);
+  border-top:1px solid var(--line);
+  padding:8px 14px calc(8px + env(safe-area-inset-bottom));
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px
+}
+.nav{
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  padding:9px;
+  border-radius:12px
+}
+.nav.on{background:#222531;color:white}
+.page{display:none}
+.page.on{display:block}
+.settings{padding:0 16px}
+.box{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:14px;
+  margin:10px 0
+}
+.box p{color:var(--muted);font-size:13px}
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:20;
+  background:rgba(0,0,0,.6);
+  align-items:flex-end
+}
+.modal.on{display:flex}
+.sheet{
+  width:100%;
+  max-width:760px;
+  margin:auto;
+  background:#11131a;
+  border-radius:22px 22px 0 0;
+  padding:14px 16px calc(20px + env(safe-area-inset-bottom));
+  max-height:92vh;
+  overflow:auto
+}
+.sheet h3{margin:0 0 12px}
+.field{margin:10px 0}
+.field label{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:5px
+}
+.field input,.field select,.field textarea{
+  width:100%;
+  background:var(--card);
+  color:var(--text);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:11px
+}
+.two{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px
+}
+.actions{
+  display:flex;
+  gap:8px;
+  margin-top:14px
+}
+.primary{background:var(--accent);flex:1}
+.danger{background:#752c35}
+.empty{text-align:center;color:var(--muted);padding:40px 10px}
+#file{display:none}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<header>
+  <div class="top">
+    <div>
+      <h1>Anime Tracker</h1>
+      <div class="sub" id="date"></div>
+    </div>
+    <button class="btn add" id="add">+</button>
+  </div>
+</header>
+
+<section class="page on" id="library">
+
+<div class="stats">
+  <div class="stat"><b id="sWatching">0</b><span>Watching</span></div>
+  <div class="stat"><b id="sCompleted">0</b><span>Completed</span></div>
+  <div class="stat"><b id="sPlanned">0</b><span>Planned</span></div>
+</div>
+
+<div class="controls">
+  <input class="search" id="search" placeholder="Search your anime…">
+  <div class="filters" id="filters"></div>
+</div>
+
+<div class="title">
+  <h2 id="heading">All anime</h2>
+  <small id="count"></small>
+</div>
+
+<div class="list" id="list"></div>
+
+</section>
+
+<section class="page" id="continue">
+  <div class="title">
+    <h2>Continue watching</h2>
+    <small>Tap +1</small>
+  </div>
+  <div class="list" id="continueList"></div>
+</section>
+
+<section class="page settings" id="settings">
+
+<div class="box">
+  <h3>Backup</h3>
+  <p>Export your list so you can restore it later.</p>
+  <button class="btn" id="export">Export backup</button>
+  <button class="btn" id="import">Import backup</button>
+  <input id="file" type="file" accept="application/json">
+</div>
+
+<div class="box">
+  <h3>iPhone</h3>
+  <p>Open this site in Safari, tap Share, then Add to Home Screen.</p>
+</div>
+
+<div class="box">
+  <h3>Storage</h3>
+  <p>Your tracking data is stored locally on this device.</p>
+  <button class="btn danger" id="reset">Reset starter list</button>
+</div>
+
+</section>
+
+</div>
+
+<nav class="bottom">
+  <button class="nav on" data-page="library">Library</button>
+  <button class="nav" data-page="continue">Continue</button>
+  <button class="nav" data-page="settings">Settings</button>
+</nav>
+
+<div class="modal" id="modal">
+<div class="sheet">
+
+<h3 id="formTitle">Add anime</h3>
+
+<form id="form">
+
+<input type="hidden" id="id">
+
+<div class="field">
+  <label>Title</label>
+  <input id="title" required>
+</div>
+
+<div class="two">
+
+<div class="field">
+<label>Status</label>
+<select id="status">
+<option>Watching</option>
+<option>Completed</option>
+<option>Plan to Watch</option>
+<option>On Hold</option>
+<option>Dropped</option>
+</select>
+</div>
+
+<div class="field">
+<label>Rating / 10</label>
+<input id="rating" type="number" min="0" max="10" step="0.5">
+</div>
+
+</div>
+
+<div class="two">
+
+<div class="field">
+<label>Episodes watched</label>
+<input id="watched" type="number" min="0" value="0">
+</div>
+
+<div class="field">
+<label>Total episodes</label>
+<input id="total" type="number" min="0">
+</div>
+
+</div>
+
+<div class="field">
+<label>Notes</label>
+<textarea id="notes" rows="3"></textarea>
+</div>
+
+<div class="actions">
+<button class="btn danger" type="button" id="del">Delete</button>
+<button class="btn" type="button" id="cancel">Cancel</button>
+<button class="btn primary" type="submit">Save</button>
+</div>
+
+</form>
+
+</div>
+</div>
+
+<script>
+
+const KEY='animeTrackerV2';
+
+const seed=[
+'My Hero Academia',
+'Demon Slayer',
+'Jujutsu Kaisen',
+'Fullmetal Alchemist: Brotherhood',
+'Hell’s Paradise',
+'DAN DA DAN',
+'Mob Psycho 100',
+'Frieren: Beyond Journey’s End',
+'Vinland Saga',
+'Cyberpunk: Edgerunners',
+'Delicious in Dungeon',
+'Sakamoto Days',
+'Magi',
+'Devil May Cry',
+'Baki / Baki Hanma / Baki-Dou',
+'The Seven Deadly Sins',
+'Castlevania',
+'The Apothecary Diaries',
+'Fate/stay night'
+].map((title,i)=>({
+  id:String(Date.now()+i),
+  title,
+  status:'Completed',
+  watched:0,
+  total:null,
+  rating:null,
+  notes:'',
+  updated:Date.now()-i
+}));
+
+seed.push(
+{
+  id:'onepiece',
+  title:'One Piece',
+  status:'Watching',
+  watched:0,
+  total:null,
+  rating:null,
+  notes:'Around Fish-Man Island / Punk Hazard',
+  updated:Date.now()+5
+},
+{
+  id:'jojo',
+  title:'JoJo’s Bizarre Adventure',
+  status:'Watching',
+  watched:0,
+  total:null,
+  rating:null,
+  notes:'Most of it watched',
+  updated:Date.now()+4
+},
+{
+  id:'blackclover',
+  title:'Black Clover',
+  status:'On Hold',
+  watched:10,
+  total:null,
+  rating:null,
+  notes:'About 10 episodes watched',
+  updated:Date.now()+3
+}
+);
+
+let data;
+
+try{
+  data=JSON.parse(localStorage.getItem(KEY))||seed;
+}catch{
+  data=seed;
+}
+
+let filter='All';
+
+const $=id=>document.getElementById(id);
+
+const esc=s=>String(s??'').replace(
+  /[&<>"']/g,
+  c=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[c])
+);
+
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(data));
+  render();
+}
+
+function filtered(){
+  let q=$('search').value.toLowerCase();
+
+  return data
+    .filter(a=>
+      (filter==='All'||a.status===filter) &&
+      (
+        !q ||
+        a.title.toLowerCase().includes(q) ||
+        (a.notes||'').toLowerCase().includes(q)
+      )
+    )
+    .sort((a,b)=>b.updated-a.updated);
+}
+
+function card(a){
+
+  let p=a.total
+    ?Math.min(100,Math.round((a.watched||0)/a.total*100))
+    :0;
+
+  return `
+  <div class="card" data-id="${a.id}">
+    <div>
+
+      <div class="name">${esc(a.title)}</div>
+
+      <div class="meta">
+        ${esc(a.status)}
+        ${a.notes?' · '+esc(a.notes):''}
+      </div>
+
+      <div class="progress">
+        <div class="bar" style="width:${p}%"></div>
+      </div>
+
+      <div class="ep">
+        ${
+          a.total
+          ?`${a.watched||0} / ${a.total} episodes`
+          :`${a.watched||0} episodes watched`
+        }
+      </div>
+
+    </div>
+
+    <div class="side">
+
+      ${
+        a.rating!=null
+        ?`<div class="rating">★ ${a.rating}</div>`
+        :''
+      }
+
+      ${
+        a.status==='Watching'
+        ?`<button class="plus" data-plus="${a.id}">+1</button>`
+        :`<button class="plus" data-edit="${a.id}">•••</button>`
+      }
+
+    </div>
+  </div>`;
+}
+
+function bind(el){
+
+  el.querySelectorAll('.card').forEach(c=>{
+
+    c.onclick=e=>{
+
+      if(e.target.closest('button')) return;
+
+      open(c.dataset.id);
+    };
+
+  });
+
+  el.querySelectorAll('[data-plus]').forEach(b=>{
+
+    b.onclick=()=>{
+
+      let a=data.find(x=>x.id===b.dataset.plus);
+
+      a.watched=(+a.watched||0)+1;
+
+      if(a.total && a.watched>=a.total){
+        a.watched=a.total;
+        a.status='Completed';
+      }
+
+      a.updated=Date.now();
+
+      save();
+    };
+
+  });
+
+  el.querySelectorAll('[data-edit]').forEach(b=>{
+    b.onclick=()=>open(b.dataset.edit);
+  });
+}
+
+function render(){
+
+  $('sWatching').textContent=
+    data.filter(a=>a.status==='Watching').length;
+
+  $('sCompleted').textContent=
+    data.filter(a=>a.status==='Completed').length;
+
+  $('sPlanned').textContent=
+    data.filter(a=>a.status==='Plan to Watch').length;
+
+  const fs=[
+    'All',
+    'Watching',
+    'Completed',
+    'Plan to Watch',
+    'On Hold',
+    'Dropped'
+  ];
+
+  $('filters').innerHTML=
+    fs.map(f=>`
+      <button
+        class="chip ${f===filter?'on':''}"
+        data-f="${f}">
+        ${f}
+      </button>
+    `).join('');
+
+  document.querySelectorAll('[data-f]').forEach(b=>{
+
+    b.onclick=()=>{
+
+      filter=b.dataset.f;
+
+      render();
+    };
+
+  });
+
+  let list=filtered();
+
+  $('heading').textContent=
+    filter==='All'?'All anime':filter;
+
+  $('count').textContent=
+    list.length+' titles';
+
+  $('list').innerHTML=
+    list.length
+      ?list.map(card).join('')
+      :'<div class="empty">Nothing here yet.</div>';
+
+  bind($('list'));
+
+  let cont=data
+    .filter(a=>a.status==='Watching')
+    .sort((a,b)=>b.updated-a.updated);
+
+  $('continueList').innerHTML=
+    cont.length
+      ?cont.map(card).join('')
+      :'<div class="empty">Nothing in progress.</div>';
+
+  bind($('continueList'));
+}
+
+function open(id){
+
+  let a=id
+    ?data.find(x=>x.id===id)
+    :null;
+
+  $('formTitle').textContent=
+    a?'Edit anime':'Add anime';
+
+  $('id').value=a?.id||'';
+  $('title').value=a?.title||'';
+  $('status').value=a?.status||'Watching';
+  $('rating').value=a?.rating??'';
+  $('watched').value=a?.watched||0;
+  $('total').value=a?.total??'';
+  $('notes').value=a?.notes||'';
+
+  $('del').style.display=
+    a?'block':'none';
+
+  $('modal').classList.add('on');
+}
+
+$('form').onsubmit=e=>{
+
+  e.preventDefault();
+
+  let id=$('id').value;
+
+  let a={
+    id:id||String(Date.now()),
+    title:$('title').value.trim(),
+    status:$('status').value,
+    rating:$('rating').value===''?null:+$('rating').value,
+    watched:+$('watched').value||0,
+    total:$('total').value===''?null:+$('total').value,
+    notes:$('notes').value.trim(),
+    updated:Date.now()
+  };
+
+  if(id){
+
+    data[
+      data.findIndex(x=>x.id===id)
+    ]=a;
+
+  }else{
+
+    data.push(a);
+
+  }
+
+  save();
+
+  $('modal').classList.remove('on');
+};
+
+$('add').onclick=()=>open();
+
+$('cancel').onclick=()=>{
+  $('modal').classList.remove('on');
+};
+
+$('del').onclick=()=>{
+
+  let id=$('id').value;
+
+  if(
+    id &&
+    confirm('Delete this anime?')
+  ){
+
+    data=data.filter(x=>x.id!==id);
+
+    save();
+
+    $('modal').classList.remove('on');
+  }
+};
+
+$('search').oninput=render;
+
+document.querySelectorAll('.nav').forEach(b=>{
+
+  b.onclick=()=>{
+
+    document
+      .querySelectorAll('.nav')
+      .forEach(x=>
+        x.classList.toggle('on',x===b)
+      );
+
+    document
+      .querySelectorAll('.page')
+      .forEach(p=>
+        p.classList.toggle(
+          'on',
+          p.id===b.dataset.page
+        )
+      );
+  };
+
+});
+
+$('export').onclick=()=>{
+
+  let blob=new Blob(
+    [JSON.stringify(data,null,2)],
+    {type:'application/json'}
+  );
+
+  let u=URL.createObjectURL(blob);
+
+  let a=document.createElement('a');
+
+  a.href=u;
+  a.download='anime-tracker-backup.json';
+
+  a.click();
+
+  URL.revokeObjectURL(u);
+};
+
+$('import').onclick=()=>{
+  $('file').click();
+};
+
+$('file').onchange=async e=>{
+
+  try{
+
+    let x=JSON.parse(
+      await e.target.files[0].text()
+    );
+
+    if(!Array.isArray(x)) throw 0;
+
+    data=x;
+
+    save();
+
+    alert('Backup imported');
+
+  }catch{
+
+    alert('Could not import backup');
+  }
+};
+
+$('reset').onclick=()=>{
+
+  if(confirm('Reset your list?')){
+
+    data=seed;
+
+    save();
+  }
+};
+
+$('date').textContent=
+  new Intl.DateTimeFormat(
+    'en-AU',
+    {
+      weekday:'long',
+      day:'numeric',
+      month:'long'
+    }
+  ).format(new Date());
+
+render();
+
+</script>
+
+</body>
+</html>
