@@ -6,10 +6,10 @@
 <meta name="theme-color" content="#0b0c11">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Next Episode">
-<link rel="icon" href="./next-episode-icon.png">
-<link rel="apple-touch-icon" href="./next-episode-icon.png">
-<title>Next Episode</title>
+<meta name="apple-mobile-web-app-title" content="EP+">
+<link rel="icon" href="./ep-plus-icon.png">
+<link rel="apple-touch-icon" href="./ep-plus-icon.png">
+<title>EP+</title>
 <style>
 :root{--bg:#080b13;--card:#141925;--card2:#1d2434;--line:#293248;--text:#f5f7fb;--muted:#9ca8bd;--accent:#615cff;--green:#35dfb0;--yellow:#f5c75d;--red:#ff6678;--safe:env(safe-area-inset-bottom);--app-height:100dvh;--vv-top:0px}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif}body{min-height:100vh;padding:env(safe-area-inset-top) 0 calc(82px + var(--safe))}
@@ -39,10 +39,10 @@ header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#080b1
 </style>
 </head>
 <body>
-<div id="splash"><div class="splashText"><img class="logo" src="./next-episode-icon.png" alt=""><b>Next <span class="brandAccent">Episode</span></b><span>Your watchlist, your way</span></div></div>
+<div id="splash"><div class="splashText"><img class="logo" src="./ep-plus-icon.png" alt=""><b>EP<span class="brandAccent">+</span></b><span>Track what you watch.</span></div></div>
 
 <div class="wrap">
-<header><div class="top"><div><h1><img class="brandMark" src="./next-episode-icon.png" alt=""><span>Next <span class="brandAccent">Episode</span></span></h1><div class="sub" id="date"></div></div><button class="btn add" id="addBtn">＋</button></div></header>
+<header><div class="top"><div><h1><img class="brandMark" src="./ep-plus-icon.png" alt=""><span>EP<span class="brandAccent">+</span></span></h1><div class="sub" id="date"></div></div><button class="btn add" id="addBtn">＋</button></div></header>
 
 <section class="page on fade" id="library">
 <div class="controls"><input class="search" id="search" type="search" placeholder="Search your library…"></div>
@@ -187,8 +187,8 @@ $('closeCategory').onclick=()=>$('categoryModal').classList.remove('on');$('clos
 $('arcForm').onsubmit=e=>{e.preventDefault();let s=data.find(x=>x.id===$('arcSeasonId').value),id=$('arcId').value,old=s?.arcs?.find(x=>x.id===id);if(!s)return;s.seasonLabel=$('arcSeasonName').value.trim()||s.seasonLabel;let arc=normArc({id:id||uid(),name:$('arcName').value.trim(),start:$('arcStart').value===''?null:Number($('arcStart').value),end:$('arcEnd').value===''?null:Number($('arcEnd').value),rating:$('arcRating').value===''?null:Number($('arcRating').value),watched:$('arcWatched').checked,progress:$('arcWatched').checked?Math.max(arcLength({start:Number($('arcStart').value),end:Number($('arcEnd').value)})||0,old?.progress||0):old?.progress||0});if(old)s.arcs[s.arcs.indexOf(old)]=arc;else s.arcs.push(arc);syncFromArcs(s);s.updated=Date.now();save();$('arcModal').classList.remove('on');openSeries(s.franchise)};
 $('deleteArc').onclick=()=>{let s=data.find(x=>x.id===$('arcSeasonId').value),id=$('arcId').value;if(!s||!id||!confirm('Delete this arc?'))return;s.arcs=s.arcs.filter(x=>x.id!==id);syncFromArcs(s);save();$('arcModal').classList.remove('on');openSeries(s.franchise)};
 const seriesActionsObserver=new MutationObserver(()=>{let body=$('seriesBody'),name=$('seriesTitle').textContent,overall=body.querySelector('.overallRating');if(overall&&!overall.querySelector('[data-remove-series]')){overall.insertAdjacentHTML('beforeend','<button class="btn removeSeries" data-remove-series>Remove TV show</button>');overall.querySelector('[data-remove-series]').onclick=()=>{if(!confirm(`Remove ${name} and all of its seasons and arcs?`))return;data=data.filter(x=>x.franchise!==name);save();$('seriesModal').classList.remove('on')}}});seriesActionsObserver.observe($('seriesBody'),{childList:true,subtree:true});
-$('exportBtn').onclick=()=>{let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='tv-show-tracker-backup.json';a.click();URL.revokeObjectURL(u)};$('importBtn').onclick=()=>$('file').click();$('file').onchange=async e=>{try{let x=JSON.parse(await e.target.files[0].text());if(!Array.isArray(x))throw 0;data=x.map(norm);save();alert('Backup imported')}catch{alert('Could not import backup')}e.target.value=''};
+$('exportBtn').onclick=()=>{let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='ep-plus-backup.json';a.click();URL.revokeObjectURL(u)};$('importBtn').onclick=()=>$('file').click();$('file').onchange=async e=>{try{let x=JSON.parse(await e.target.files[0].text());if(!Array.isArray(x))throw 0;data=x.map(norm);save();alert('Backup imported')}catch{alert('Could not import backup')}e.target.value=''};
 $('date').textContent=new Intl.DateTimeFormat('en-AU',{weekday:'long',day:'numeric',month:'long'}).format(new Date());persist();render();setTimeout(()=>$('splash').classList.add('hide'),550);
-if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js?v=22').then(r=>{r.update();let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload()})}).catch(()=>{});
+if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js?v=23').then(r=>{r.update();let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload()})}).catch(()=>{});
 </script>
 </body></html>
