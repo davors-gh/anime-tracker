@@ -1,4 +1,4 @@
-const CACHE='anime-tracker-shell-v18';
+const CACHE='anime-tracker-shell-v19';
 const ASSETS=['./','./index.html'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
