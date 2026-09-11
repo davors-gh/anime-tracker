@@ -1,4 +1,4 @@
-const CACHE='anime-tracker-shell-v23';
+const CACHE='anime-tracker-shell-v24';
 const ASSETS=['./','./index.html','./ep-plus-icon.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
